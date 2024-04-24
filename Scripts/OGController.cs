@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +13,8 @@ public class OGController : MonoBehaviour
     private Animator animator;
 
     public LayerMask solidObjectsLayer;
+    public LayerMask interactableLayer;
+
 
     private void Awake()
     {
@@ -47,6 +49,21 @@ public class OGController : MonoBehaviour
         }
 
         animator.SetBool("isMoving", isMoving);
+
+        if (input.GetKeyDown(KeyCode.Z))
+            Interact();
+    }
+
+    void Interact()
+    {
+        var facingDirection = new Vector3(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
+        var interactPosition transform.position + facingDirection;
+
+        var collider = Physics2D.OverlapCircle(interactPosition, 0.2f, interactableLayer);
+        if (collider != null)
+        {
+            collider.GetComponent<Interactable>()?.Interact();
+        }
     }
 
     IEnumerator Move(Vector3 targetPos)
@@ -65,7 +82,7 @@ public class OGController : MonoBehaviour
 
     private bool IsWalkable(Vector3 targetPos)
     {
-        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer) != null)
+        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer | interactableLayer) != null)
         {
             return false;
         }
