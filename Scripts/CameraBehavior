@@ -30,9 +30,15 @@ public class CameraBehavior: MonoBehavior
         Collider2D collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactableLayer);
         if (collider != null)
         {
-                TakePhoto();
-                AddItemToInventory(collider.gameObject.tag); //tag for which animal
-                Destroy(collider.gameObject);
+            StartCoroutine(WaitForEEE(collider.gameObject.tag, 10f));
+                /*TakePhoto();
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    AddItemToInventory(collider.gameObject.tag); //tag for which animal
+                    Destroy(collider.gameObject);
+                }*/
+            Destroy(collider.gameObject);
+                
         } else if(IsAntagonistVisible())
         {
             TakePhoto();
@@ -63,6 +69,27 @@ public class CameraBehavior: MonoBehavior
         }
         flashImage.enabled = false;
     }
+
+IEnumerator WaitForEEE(string objectTag, float duration)
+{
+    bool eKeyPressed = false;
+    float timer = 0f;
+    while (timer < duration && !eKeyPressed)
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            eKeyPressed = true;
+        }
+
+        timer += Time.deltaTime;
+        yield return null;
+    }
+    if (eKeyPressed)
+    {
+        AddItemToInventory(objectTag);
+    }
+
+}
     void FlashAntagonist()
     {
         antagonist.GetComponent<AntagonistAI>().slow();
