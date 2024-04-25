@@ -31,8 +31,8 @@ public class CameraBehavior: MonoBehavior
         if (collider != null)
         {
             StartCoroutine(WaitForEEE(collider.gameObject.tag, 10f));
-                /*TakePhoto();
-                if (Input.GetKeyDown(KeyCode.E))
+            TakePhoto();
+              /*  if (Input.GetKeyDown(KeyCode.E))
                 {
                     AddItemToInventory(collider.gameObject.tag); //tag for which animal
                     Destroy(collider.gameObject);
