@@ -1,0 +1,50 @@
+//Same as before, tag the antagonist. Also, no sure what the player is
+//tagged, just rename if needed. Gracias.
+using UnityEngine;
+
+public class AntagonistAI : MonoBehavior
+{
+    public float moveSpeed = 0.150f; //? Not sure, grabbed camera move speed for reference
+    public float slowed = 0.100f;
+    public float slowDur = 1.5f;
+
+    private bool isFlashed = false;
+
+    private void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
+    private void Update()
+    {
+        if (isFlashed)
+        {
+            slow();
+        } else if (player != null)
+        {
+            MoveTowardsPlayer();
+        }
+    }
+    private void MoveTowardsPlayer()
+    {
+        Vector3 direction = (player.position - transform.position).normalized;
+        transform.position += direction * moveSpeed * Time.deltaTime;
+    }
+    public void slow()
+    {
+        if(!isFlashed)
+        {
+            movementSpeed = slowed;
+            isFlashed = true;
+
+            StartCoroutine(restoreSpeed());
+        }
+    }
+    IEnumerator restoreSpeed()
+    {
+        yield return new WaitForSeconds(slowDur);
+        
+        moveSpeed = 0.150f;
+        isFlashed = false;
+    }
+}
