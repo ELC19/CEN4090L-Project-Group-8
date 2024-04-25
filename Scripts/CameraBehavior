@@ -31,7 +31,7 @@ public class CameraBehavior: MonoBehavior
         if (collider != null)
         {
                 TakePhoto();
-
+                AddItemToInventory(collider.gameObject.tag); //tag for which animal
                 Destroy(collider.gameObject);
         } else if(IsAntagonistVisible())
         {
@@ -67,4 +67,44 @@ public class CameraBehavior: MonoBehavior
     {
         antagonist.GetComponent<AntagonistAI>().slow();
     }
+    void AddItemToInventory(string tag)
+    {
+        Inventory inventory = FindObjectOfType<Inventory>();
+        ItemType itemType= ItemType.Flower;
+        switch (tag)
+        {
+            case "Flower":
+                itemType = ItemType.Flower;
+                break;
+            case "Key":
+                itemType = ItemType.Key;
+                break;
+            case "Deer":
+                itemType = ItemType.Deer;
+                break;
+            case "Panther":
+                itemType = ItemType.Panther;
+                break;
+            case "Alligator":
+                itemType = ItemType.Alligator;
+                break;
+            case "Spoonbill":
+                itemType = ItemType.Spoonbill;
+                break;
+            case "Bullfrog":
+                itemType = ItemType.Bullfrog;
+                break;
+            case "Blackbear":
+                itemType = ItemType.Bullfrog;
+                break;
+            case "Otter":
+                itemType = ItemType.Otter;
+                break;
+            case "Yellowbelly":
+                itemType = ItemType.Yellowbelly;
+                break;
+        }
+        inventory.AddItem(new Item { itemType = itemType, amount = 1 });
+    }
+}
 }
