@@ -15,12 +15,24 @@ public class OGController : MonoBehaviour
     public LayerMask solidObjectsLayer;
     public LayerMask interactableLayer;
 
+    //new
+    private Inventory inventory;
+
+    [SerializeField] private UI_Inventory uiInventory;
+
+
+    //end of new
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
-    }
 
+        //new
+        inventory = new Inventory();
+        uiInventory.SetInventory(inventory);
+        
+    }
+    //end of new
     private void Update()
     {
         if (!isMoving)
@@ -52,6 +64,20 @@ public class OGController : MonoBehaviour
 
         if (input.GetKeyDown(KeyCode.Z))
             Interact();
+
+        //new
+        if (Input.GetKeyDown(KeyCode.E)) {
+            // Check for items around the player or within reach
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 1.0f);
+            foreach (var hitCollider in hitColliders) {
+                ItemWorld itemWorld = hitCollider.GetComponent<ItemWorld>();
+                if (itemWorld != null) {
+                    inventory.AddItem(itemWorld.GetItem());
+                    itemWorld.DestroySelf();
+                }
+            }
+        }
+        //end new
     }
 
     void Interact()
@@ -89,4 +115,5 @@ public class OGController : MonoBehaviour
 
         return true;
     }
+
 }
