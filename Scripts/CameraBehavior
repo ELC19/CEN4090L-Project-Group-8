@@ -2,6 +2,7 @@
  UI Image that covers entire screen- for flashImage
  Interactable layer over animals- enables detection & removal via Interact() (need code for transferring to journal)
 Animator- self explanatory
+antagonist- If we add, make sure to label so we can photo while he's on screen too.
  */
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +33,16 @@ public class CameraBehavior: MonoBehavior
                 TakePhoto();
 
                 Destroy(collider.gameObject);
+        } else if(IsAntagonistVisible())
+        {
+            TakePhoto();
+            FlashAntagonist();
         }
+    }
+    bool IsAntagonistVisible()
+    {
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(antagonist.transform.position);
+        return screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
     }
     public void TakePhoto()
     {
@@ -52,5 +62,9 @@ public class CameraBehavior: MonoBehavior
             yield return null;
         }
         flashImage.enabled = false;
+    }
+    void FlashAntagonist()
+    {
+        antagonist.GetComponent<AntagonistAI>().slow();
     }
 }
