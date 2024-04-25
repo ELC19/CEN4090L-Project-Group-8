@@ -37,7 +37,6 @@ public class CameraBehavior: MonoBehavior
                     AddItemToInventory(collider.gameObject.tag); //tag for which animal
                     Destroy(collider.gameObject);
                 }*/
-            Destroy(collider.gameObject);
                 
         } else if(IsAntagonistVisible())
         {
@@ -88,6 +87,7 @@ IEnumerator WaitForEEE(string objectTag, float duration)
     {
         AddItemToInventory(objectTag);
     }
+    Destroy(collider.gameObject);
 
 }
     void FlashAntagonist()
