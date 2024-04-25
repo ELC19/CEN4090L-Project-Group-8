@@ -1,0 +1,56 @@
+/*Necessary objects in scene:
+ UI Image that covers entire screen- for flashImage
+ Interactable layer over animals- enables detection & removal via Interact() (need code for transferring to journal)
+Animator- self explanatory
+ */
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+
+public class CameraBehavior: MonoBehavior
+{
+    public Animator animator;
+    public Layermask interactablelayer;
+    public float flashduration = 0.5f;
+    public Color flashcolor = new Color(1f, 1f, 1f, 1f);
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Interact();
+        }
+    }
+    void Interact()
+    {
+        var facingDir = new Vector2(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
+        var interactPos = transform.position + facingDir;
+
+        //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
+        Collider2D collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactableLayer);
+        if (collider != null)
+        {
+                TakePhoto();
+
+                Destroy(collider.gameObject);
+        }
+    }
+    public void TakePhoto()
+    {
+        StartCoroutine(FlashEffect());
+    }
+    IEnumerator FlashEffect()
+    {
+        flashImage.color = flashcolor;
+        flashImage.enabled = true;
+        float fadespeed = if / flashduration;
+        while (flashImage.color.a > 0)
+        {
+            Color newcolor = flashImage.color;
+            newcolor.a -= fadespeed * Time.deltaTime;
+
+            flashImage.color = newcolor;
+            yield return null;
+        }
+        flashImage.enabled = false;
+    }
+}
