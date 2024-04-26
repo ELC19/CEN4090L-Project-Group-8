@@ -7,14 +7,18 @@ antagonist- If we add, make sure to label so we can photo while he's on screen t
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Numerics;
+using static Item;
 
-public class CameraBehavior: MonoBehavior
+public class CameraBehavior : MonoBehaviour
 {
     public Animator animator;
-    public Layermask interactablelayer;
+    public LayerMask InteractableLayer;
     public float flashduration = 0.5f;
     public Color flashcolor = new Color(1f, 1f, 1f, 1f);
     public GameObject antagonist;
+    public Image flashImage;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -22,117 +26,130 @@ public class CameraBehavior: MonoBehavior
             Interact();
         }
     }
+
     void Interact()
     {
-        var facingDir = new Vector2(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
-        var interactPos = transform.position + facingDir;
+        UnityEngine.Vector2 facingDir = new UnityEngine.Vector2(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
+        UnityEngine.Vector3 interactPos = transform.position + new UnityEngine.Vector3(facingDir.x, facingDir.y, 0);
 
-        //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
-        Collider2D collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactableLayer);
+        Collider2D collider = Physics2D.OverlapCircle(interactPos, 0.2f, LayerMask.GetMask("InteractableLayer"));
         if (collider != null)
         {
-            StartCoroutine(WaitForEEE(collider.gameObject.tag, 10f));
-            TakePhoto();
-              /*  if (Input.GetKeyDown(KeyCode.E))
-                {
-                    AddItemToInventory(collider.gameObject.tag); //tag for which animal
-                    Destroy(collider.gameObject);
-                }*/
-                
-        } else if(IsAntagonistVisible())
+            collider.GetComponent<Interactable>()?.Interact();
+        }
+        else
         {
-            TakePhoto();
-            FlashAntagonist();
+            Debug.Log("No interactable collider found at interact position.");
         }
     }
+
+    IEnumerator FlashAndCollect(Collider2D animalCollider)
+    {
+        StartCoroutine(FlashEffect());
+        yield return new WaitForSeconds(flashduration);
+        AddItemToInventory(animalCollider.tag);
+        Destroy(animalCollider.gameObject);
+    }
+
+    bool IsAnimalTag(string tag)
+    {
+        return tag == "Blackbear" || tag == "Deer" || tag == "Panther" || tag == "Bullfrog" || tag == "Otter" || tag == "Alligator" || tag == "Spoonbill" || tag == "Yellowbelly" || tag == "Watermoccasin";
+    }
+
     bool IsAntagonistVisible()
     {
-        Vector3 screenPoint = Camera.main.WorldToViewportPoint(antagonist.transform.position);
+        UnityEngine.Vector3 screenPoint = Camera.main.WorldToViewportPoint(antagonist.transform.position);
         return screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
     }
+
     public void TakePhoto()
     {
         StartCoroutine(FlashEffect());
     }
+
     IEnumerator FlashEffect()
     {
         flashImage.color = flashcolor;
         flashImage.enabled = true;
-        float fadespeed = if / flashduration;
+        float fadeSpeed = 1f / flashduration;
         while (flashImage.color.a > 0)
         {
-            Color newcolor = flashImage.color;
-            newcolor.a -= fadespeed * Time.deltaTime;
-
-            flashImage.color = newcolor;
+            Color newColor = flashImage.color;
+            newColor.a -= fadeSpeed * Time.deltaTime;
+            flashImage.color = newColor;
             yield return null;
         }
         flashImage.enabled = false;
     }
 
-IEnumerator WaitForEEE(string objectTag, float duration)
-{
-    bool eKeyPressed = false;
-    float timer = 0f;
-    while (timer < duration && !eKeyPressed)
+    IEnumerator WaitForEEE(string objectTag, float duration)
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        bool eKeyPressed = false;
+        float timer = 0f;
+        while (timer < duration && !eKeyPressed)
         {
-            eKeyPressed = true;
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                eKeyPressed = true;
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
         }
+        if (eKeyPressed)
+        {
+            AddItemToInventory(objectTag);
+        }
+        Destroy(GetComponent<Collider>().gameObject);
 
-        timer += Time.deltaTime;
-        yield return null;
     }
-    if (eKeyPressed)
-    {
-        AddItemToInventory(objectTag);
-    }
-    Destroy(collider.gameObject);
 
-}
     void FlashAntagonist()
     {
-        antagonist.GetComponent<AntagonistAI>().slow();
+        antagonist.GetComponent<AntagonistAI>().Slow();
     }
-    void AddItemToInventory(string tag)
+
+    public void AddItemToInventory(string tag)
     {
-        Inventory inventory = FindObjectOfType<Inventory>();
-        ItemType itemType= ItemType.Flower;
+        Inventory inventory = InventoryManager.Instance.inventory;
+        Item.ItemType? itemType = MapTagToItemType(tag);
+        if (itemType.HasValue) 
+        {
+            inventory.AddItem(new Item { itemType = itemType.Value, amount = 1 });
+            Debug.Log("Added " + itemType.Value.ToString() + " to inventory.");
+        }
+        else
+        {
+            Debug.Log("No valid item type found for tag: " + tag);
+        }
+    }
+
+    Item.ItemType? MapTagToItemType(string tag)
+    {
         switch (tag)
         {
             case "Flower":
-                itemType = ItemType.Flower;
-                break;
+                return Item.ItemType.Flower;
             case "Key":
-                itemType = ItemType.Key;
-                break;
+                return Item.ItemType.Key;
             case "Deer":
-                itemType = ItemType.Deer;
-                break;
+                return Item.ItemType.Deer;
             case "Panther":
-                itemType = ItemType.Panther;
-                break;
+                return Item.ItemType.Panther;
             case "Alligator":
-                itemType = ItemType.Alligator;
-                break;
+                return Item.ItemType.Alligator;
             case "Spoonbill":
-                itemType = ItemType.Spoonbill;
-                break;
+                return Item.ItemType.Spoonbill;
             case "Bullfrog":
-                itemType = ItemType.Bullfrog;
-                break;
+                return Item.ItemType.Bullfrog;
             case "Blackbear":
-                itemType = ItemType.Bullfrog;
-                break;
+                return Item.ItemType.Blackbear;
             case "Otter":
-                itemType = ItemType.Otter;
-                break;
+                return Item.ItemType.Otter;
             case "Yellowbelly":
-                itemType = ItemType.Yellowbelly;
-                break;
+                return Item.ItemType.Yellowbelly;
+            default:
+                return null;
         }
-        inventory.AddItem(new Item { itemType = itemType, amount = 1 });
     }
-}
 }
