@@ -71,7 +71,7 @@ public class CameraBehavior : MonoBehaviour
     {
         flashImage.color = flashcolor;
         flashImage.enabled = true;
-        float fadeSpeed = 1f / flashduration;
+        float fadeSpeed = 1.0f / flashduration;
         while (flashImage.color.a > 0)
         {
             Color newColor = flashImage.color;
