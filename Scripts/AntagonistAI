@@ -10,7 +10,8 @@ public class AntagonistAI : MonoBehavior
     public float slowDur = 1.5f;
 
     private bool isFlashed = false;
-    public Image dangersign = 
+    public Image dangersign;
+    public GameObject player;
 
     private void Start()
     {
