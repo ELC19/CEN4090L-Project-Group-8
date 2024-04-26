@@ -14,6 +14,7 @@ public class CameraBehavior: MonoBehavior
     public Layermask interactablelayer;
     public float flashduration = 0.5f;
     public Color flashcolor = new Color(1f, 1f, 1f, 1f);
+    public GameObject antagonist;
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
