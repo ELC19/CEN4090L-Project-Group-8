@@ -79,16 +79,34 @@ public class OGController : MonoBehaviour
         }
         //end new
     }
-
     void Interact()
     {
         var facingDirection = new Vector3(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
-        var interactPosition transform.position + facingDirection;
+        var interactPosition = transform.position + facingDirection;
 
-        var collider = Physics2D.OverlapCircle(interactPosition, 0.2f, interactableLayer);
+        Debug.DrawLine(transform.position, interactPosition, Color.red, 1f);
+
+        var collider = Physics2D.OverlapCircle(interactPosition, 0.2f, InteractableLayer);
         if (collider != null)
         {
-            collider.GetComponent<Interactable>()?.Interact();
+            Debug.Log("interaction");
+            Debug.Log($"Collider found: {collider.gameObject.name}");
+            var interactable = collider.GetComponent<Interactable>();
+            if (interactable != null)
+            {
+                interactable.Interact();
+            }
+            else
+            {
+                Debug.Log("Interactable component not found on " + collider.gameObject.name);
+                // Check if there are any components of type Interactable
+                var interactables = collider.GetComponents<Interactable>();
+                Debug.Log("Number of Interactable components: " + interactables.Length);
+            }
+        }
+        else
+        {
+            Debug.Log("No interactable collider found.");
         }
     }
 
