@@ -6,10 +6,13 @@ using UnityEngine;
 [System.Serializable]
 public class Dialogue
 {
-    [SerializeField] List<string> lines;
+    [SerializeField]
+    private List<string> lines;
+    public bool endsGame = false;
 
     public List<string> Lines
     {
-        get {return lines;}
+        get { return lines; }
+        set { lines = value; } 
     }
 }
