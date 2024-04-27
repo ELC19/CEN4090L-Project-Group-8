@@ -1,10 +1,11 @@
-using Systems.Collections;
-using Systems.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
+using static UnityEditor.Progress;
 
-public class Inventory {
-
-    public event EventHandler OnItemListChanged;
+public class Inventory 
+{
 
     private List<Item> itemList;
 
@@ -12,26 +13,37 @@ public class Inventory {
     {
         itemList = new List<Item>();
 
-        AddItem(new Item { itemType = itemList.ItemType.Flower, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Key, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Deer, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Panther, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Alligator, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Spoonbill, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Bullfrog, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Blackbear, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Otter, amount = 1});
-        AddItem(new Item { itemType = itemList.ItemType.Yellowbelly, amount = 1});
-    
+        AddItem(new Item { itemType = Item.ItemType.Flower, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Key, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Deer, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Panther, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Alligator, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Spoonbill, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Bullfrog, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Blackbear, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Otter, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Yellowbelly, amount = 0 });
+        AddItem(new Item { itemType = Item.ItemType.Watermocassin, amount = 0 });
+
+        Debug.Log(itemList.Count);
+
     }
 
-    public void AddItem(Item item) {
-        itemList.Add(item);
-        OnItemListChanged?.Invoke(this, EventArgs.Empty);
-        
+    public void AddItem(Item item)
+    {
+        var existingItem = itemList.Find(x => x.itemType == item.itemType);
+        if (existingItem != null)
+        {
+            existingItem.amount += item.amount;
+        }
+        else
+        {
+            itemList.Add(item);
+        }
     }
 
-    public List<Item> GetItemList() {
+    public List<Item> GetItemList()
+    {
         return itemList;
     }
 }

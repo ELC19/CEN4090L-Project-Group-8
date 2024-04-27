@@ -2,29 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemWorld: MonoBehaviour {
-
-    private ItemWorld item;
+public class ItemWorld : MonoBehaviour
+{
+    
+    private Item item;
 
     private SpriteRenderer spriteRenderer;
-    private void Awake() {
+    private void Awake()
+    {
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    public void SetItem(ItemWorld item) {
+    public void SetItem(Item item)
+    {
         this.item = item;
         spriteRenderer.sprite = item.GetSprite();
 
     }
 
-    public ItemWorld GetItem(){
+    public Item GetItem()
+    {
         return item;
 
     }
 
-    public void DestroySelf(){
-        DestroySelf(gameObject);
+    public void DestroySelf()
+    {
+        Destroy(gameObject);
     }
-
+    
 }
-
