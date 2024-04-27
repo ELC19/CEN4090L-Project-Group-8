@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class OGController : MonoBehaviour
 {
@@ -13,35 +14,54 @@ public class OGController : MonoBehaviour
     private Animator animator;
 
     public LayerMask solidObjectsLayer;
-    public LayerMask interactableLayer;
+    public LayerMask InteractableLayer;
 
-    //new
     private Inventory inventory;
 
-    [SerializeField] private UI_Inventory uiInventory;
+    void Start()
+    {
 
+        Vector2 spawnPosition;
 
-    //end of new
+        if (PlayerPrefs.HasKey("FixedSpawnPosX") && PlayerPrefs.HasKey("FixedSpawnPosY"))
+        {
+            spawnPosition = new Vector2(
+                PlayerPrefs.GetFloat("FixedSpawnPosX"),
+                PlayerPrefs.GetFloat("FixedSpawnPosY")
+            );
+
+            PlayerPrefs.DeleteKey("FixedSpawnPosX");
+            PlayerPrefs.DeleteKey("FixedSpawnPosY");
+        }
+        else
+        {
+            spawnPosition = new Vector2(
+                PlayerPrefs.GetFloat("PlayerPosX", 0), 
+                PlayerPrefs.GetFloat("PlayerPosY", 0)
+            );
+        }
+
+        transform.position = spawnPosition;
+    }
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
 
-        //new
         inventory = new Inventory();
-        uiInventory.SetInventory(inventory);
-        
+
     }
-    //end of new
-    private void Update()
+
+
+    public void HandleUpdate()
     {
         if (!isMoving)
         {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
 
-            Debug.Log("This is input.x" + input.x);
-            Debug.Log("This is unput.y" + input.y);
+            //Debug.Log("This is input.x" + input.x);
+            //Debug.Log("This is unput.y" + input.y);
 
             if (input.x != 0) input.y = 0;
 
@@ -61,24 +81,34 @@ public class OGController : MonoBehaviour
         }
 
         animator.SetBool("isMoving", isMoving);
-
-        if (input.GetKeyDown(KeyCode.Z))
+        
+        if (Input.GetKeyDown(KeyCode.I))
             Interact();
 
-        //new
-        if (Input.GetKeyDown(KeyCode.E)) {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            DialogueManager.Instance.ToggleInventoryDisplay();
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
             // Check for items around the player or within reach
             Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 1.0f);
-            foreach (var hitCollider in hitColliders) {
+            foreach (var hitCollider in hitColliders)
+            {
                 ItemWorld itemWorld = hitCollider.GetComponent<ItemWorld>();
-                if (itemWorld != null) {
+                if (itemWorld != null)
+                {
                     inventory.AddItem(itemWorld.GetItem());
                     itemWorld.DestroySelf();
                 }
             }
         }
-        //end new
+        
     }
+
+    
     void Interact()
     {
         var facingDirection = new Vector3(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
@@ -109,6 +139,7 @@ public class OGController : MonoBehaviour
             Debug.Log("No interactable collider found.");
         }
     }
+    
 
     IEnumerator Move(Vector3 targetPos)
     {
@@ -126,12 +157,12 @@ public class OGController : MonoBehaviour
 
     private bool IsWalkable(Vector3 targetPos)
     {
-        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer | interactableLayer) != null)
+        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer | InteractableLayer) != null)
         {
             return false;
         }
 
         return true;
     }
-
 }
+
