@@ -71,7 +71,7 @@ public class CameraBehavior : MonoBehaviour
     {
         flashImage.color = flashcolor;
         flashImage.enabled = true;
-        float fadeSpeed = 1.0f / flashduration;
+        float fadeSpeed = 1f / flashduration;
         while (flashImage.color.a > 0)
         {
             Color newColor = flashImage.color;
@@ -148,6 +148,8 @@ public class CameraBehavior : MonoBehaviour
                 return Item.ItemType.Otter;
             case "Yellowbelly":
                 return Item.ItemType.Yellowbelly;
+            case "Watermocassin":
+                return Item.ItemType.Watermocassin;
             default:
                 return null;
         }
